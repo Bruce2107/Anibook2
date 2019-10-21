@@ -6,8 +6,6 @@ import Banco.FuncoesDAO;
 import Classes.Funcoes;
 import Classes.TabelaLA;
 import java.util.ArrayList;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
 public class CriarTurma extends javax.swing.JInternalFrame {
     String cpf;
@@ -66,9 +64,9 @@ public class CriarTurma extends javax.swing.JInternalFrame {
         jLabel1.setText("Nome da Turma:");
 
         jButton1.setText("Criar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
             }
         });
 
@@ -81,9 +79,9 @@ public class CriarTurma extends javax.swing.JInternalFrame {
 
         jButton2.setBackground(new java.awt.Color(176, 196, 222));
         jButton2.setText("Inserir Aluno");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton2MouseClicked(evt);
             }
         });
 
@@ -228,30 +226,6 @@ public class CriarTurma extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if("".equals(nomeTurma.getText())){
-            //mensagem.setText("Não foi possível criar a turma, coloque algum nome"); mensagem2.setText("");
-            JOptionPane optionPane = new JOptionPane("A turma deve possuir um nome", JOptionPane.ERROR_MESSAGE);    
-            JDialog dialog = optionPane.createDialog("Erro");
-            dialog.setAlwaysOnTop(true);
-            dialog.setVisible(true);
-        }
-        else{
-            if(fdao.CriarTurma(cpf, nomeTurma.getText().replace(" ", "_"))){
-                /*mensagem2.setText("A turma foi criada com sucesso");
-                mensagem.setText("");*/
-                JOptionPane.showMessageDialog(null,"A turma foi criada com sucesso");
-                f.AtualizaCombo(cpf, Turmas);
-            }
-            else{ //mensagem.setText("Não foi possível criar a turma! Não utilize caracteres especiais");mensagem2.setText("");
-                JOptionPane optionPane = new JOptionPane("Não foi possível criar a turma!\nVocê já não criou esta turma?\nNão utilize caracteres especiais (!,@,#,$,%)", JOptionPane.ERROR_MESSAGE);    
-                JDialog dialog = optionPane.createDialog("Erro");
-                dialog.setAlwaysOnTop(true);
-                dialog.setVisible(true);
-            }
-
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void TurmasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_TurmasItemStateChanged
         if(Turmas.getSelectedItem() != null){
@@ -272,32 +246,59 @@ public class CriarTurma extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_TurmasItemStateChanged
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        if("".equals(nomeTurma.getText()) || nomeTurma.getText() == null){
+            f.gerarMessageBox("ERRO", "A turma deve possuir um nome");
+        }
+        else{
+            if(fdao.CriarTurma(cpf, nomeTurma.getText().replace(" ", "_"))){
+                f.gerarMessageBox("", "A turma foi criada com sucesso");
+                f.AtualizaCombo(cpf, Turmas);
+            }
+            else{ //mensagem.setText("Não foi possível criar a turma! Não utilize caracteres especiais");mensagem2.setText("");
+                f.gerarMessageBox("ERRO","Não foi possível criar a turma!\nVocê já não criou esta turma?\nNão utilize caracteres especiais (!,@,#,$,%)");    
+            }
+
+        }
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         String nomet = nomeAluno.getText();
-        int dadast = Integer.parseInt(AulasDadas.getText());
-        int previstast = Integer.parseInt(AulasPrevistas.getText());
-        int faltast = Integer.parseInt(FaltasAluno.getText());
-        int compensadast = Integer.parseInt(CompensadasAluno.getText());
-        if(!"".equals(nomet) && nomet != null){
+        int dadast;
+        int previstast;
+        int faltast;
+        int compensadast;
+        int s = 0;
+        if(nomeAluno.getText() == null || "".equals(nomeAluno.getText()))
+            f.gerarMessageBox("ERRO", "O nome deve ser preenchido");
+        else{ nomet = nomeAluno.getText();s++;}
+        if(("".equals(FaltasAluno.getText())) || (FaltasAluno.getText() == null) || (Integer.parseInt(FaltasAluno.getText()) < 0)){
+            faltast = 0; s++;
+        }else{faltast = Integer.parseInt(FaltasAluno.getText());s++;}
+        if(("".equals(CompensadasAluno.getText())) || (CompensadasAluno.getText() == null) || (Integer.parseInt(CompensadasAluno.getText()) < 0)){
+            compensadast = 0; s++;
+        }else{compensadast = Integer.parseInt(CompensadasAluno.getText());s++;}
+        if(("".equals(AulasDadas.getText())) || (AulasDadas.getText() == null) || (Integer.parseInt(AulasDadas.getText()) < 0)){
+            dadast = 0; s++;
+        }else{dadast = Integer.parseInt(AulasDadas.getText());s++;}
+        if(("".equals(AulasPrevistas.getText())) || (AulasPrevistas.getText() == null) || (Integer.parseInt(AulasPrevistas.getText()) < 0)){
+            previstast = 0; s++;
+        }else{previstast = Integer.parseInt(AulasPrevistas.getText());s++;}
+        if(s == 5){
             if(fdao.InsereAluno(cpf+Turmas.getSelectedItem(), nomet, faltast, 0, dadast, previstast,compensadast)){
-                /*mensagem2.setText("Aluno adcionado com sucesso");
-                nomeAluno.setText("");*/
-                JOptionPane.showMessageDialog(null,"Aluno adicionado com sucesso");
+
+                f.gerarMessageBox(null,"Aluno adicionado com sucesso");
                 FaltasAluno.setText("0");
+                nomeAluno.setText("");
                 CompensadasAluno.setText("0");
+                f.AtualizaCombo(cpf, Turmas);
             }
             else{
-                JOptionPane optionPane = new JOptionPane("Não foi possível adicionar o aluno", JOptionPane.ERROR_MESSAGE);    
-                JDialog dialog = optionPane.createDialog("Erro");
-                dialog.setAlwaysOnTop(true);
-                dialog.setVisible(true);
+                f.gerarMessageBox("ERRO","Não foi possível adicionar o aluno");    
             }
-        }else{JOptionPane optionPane = new JOptionPane("Informe o nome do aluno", JOptionPane.ERROR_MESSAGE);    
-                JDialog dialog = optionPane.createDialog("Erro");
-                dialog.setAlwaysOnTop(true);
-                dialog.setVisible(true);}
+        }
         
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButton2MouseClicked
     public void atualiza(){
         f.AtualizaCombo(cpf, Turmas);
     }

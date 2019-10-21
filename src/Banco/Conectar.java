@@ -10,7 +10,7 @@ public class Conectar {
     static String bancodados = "cl17115";
     static String login = "cl17115";
     static String senha = "cl*21072001";
-    static String url = "jdbc:mysql://143.106.241.1/"+bancodados;
+    static String url = "jdbc:mysql://143.106.241.3/"+bancodados;
     Connection c = null;
     public Conectar(){
         try{

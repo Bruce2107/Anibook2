@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 public class Funcoes {
     FuncoesDAO fdao = new FuncoesDAO();
@@ -32,5 +34,16 @@ public class Funcoes {
             Turmas.addItem(turma);
         });
     }
-    
+    public void gerarMessageBox(String tipo, String msg){
+        if("ERRO".equals(tipo)){
+            JOptionPane optionPane = new JOptionPane(msg, JOptionPane.ERROR_MESSAGE);    
+            JDialog dialog = optionPane.createDialog("Erro");
+            dialog.setAlwaysOnTop(true);
+            dialog.setVisible(true);
+        }
+        else{
+            JOptionPane.showMessageDialog(null, msg);
+        }
+        
+    }
 }

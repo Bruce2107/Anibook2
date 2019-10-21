@@ -75,7 +75,7 @@ public class GerarRelatorio {
             PdfPTable t = new PdfPTable(5);
             t.setSpacingBefore(20);
             Font font = new Font(Font.FontFamily.HELVETICA,12,Font.BOLDITALIC);
-            PdfPCell numero = new PdfPCell(new Paragraph("Número",font));
+            PdfPCell numero = new PdfPCell(new Paragraph("RA",font));
             PdfPCell nome = new PdfPCell(new Paragraph("Nome",font));
             PdfPCell faltas = new PdfPCell(new Paragraph("Faltas",font));
             PdfPCell compensadas = new PdfPCell(new Paragraph("Compensadas",font));

@@ -6,8 +6,11 @@ package Visual;
 import Banco.FuncoesDAO;
 import Classes.Funcoes;
 import Relatorio.GerarRelatorio;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EscolherRelatorio extends javax.swing.JInternalFrame {
     String cpf;
@@ -69,13 +72,16 @@ public class EscolherRelatorio extends javax.swing.JInternalFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         
-        if(new GerarRelatorio(cpf, (String) Turmas.getSelectedItem()).Criar())
-            JOptionPane.showMessageDialog(null, "Relatório criado com sucesso!");
-        else{
-            JOptionPane optionPane = new JOptionPane("Houve um erro ao gerar o relatório!\nSe houver arquivos de relatório abertos feche-os", JOptionPane.ERROR_MESSAGE);    
-            JDialog dialog = optionPane.createDialog("Erro");
-            dialog.setAlwaysOnTop(true);
-            dialog.setVisible(true);
+        if(new GerarRelatorio(cpf, (String) Turmas.getSelectedItem()).Criar()){
+            File file = new File((String) Turmas.getSelectedItem()+".pdf");
+            f.gerarMessageBox("", "Relatório criado com sucesso\n"+file.getAbsolutePath());
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException ex) {
+                Logger.getLogger(EscolherRelatorio.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            f.gerarMessageBox("ERRO", "Houve um erro ao gerar o relatório!\nSe houver arquivos de relatório abertos feche-os");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

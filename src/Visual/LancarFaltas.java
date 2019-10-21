@@ -7,8 +7,6 @@ import Banco.FuncoesDAO;
 import Classes.Funcoes;
 import Classes.SalvarFaltas;
 import Classes.TabelaLF;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 public class LancarFaltas extends javax.swing.JInternalFrame {
     TabelaLF t = new TabelaLF();
     String cpf;
@@ -117,11 +115,9 @@ public class LancarFaltas extends javax.swing.JInternalFrame {
             else
                 sf.setPresente((Object)Tabela.getValueAt(i, 2));
             if(!fdao.LancarFaltas(sf, cpf+Turmas.getSelectedItem(), falta,falta)){
-                JOptionPane optionPane = new JOptionPane("Não foi possivel salvar as alterações", JOptionPane.ERROR_MESSAGE);    
-                JDialog dialog = optionPane.createDialog("Erro");
-                dialog.setAlwaysOnTop(true);
-                dialog.setVisible(true);
-            }
+                f.gerarMessageBox("ERRO", "Não foi possível salvar as alterações");
+            }else
+                f.gerarMessageBox("", "As faltas foram lançadas com sucesso");
         }
         t.visualizar(Tabela, cpf+Turmas.getSelectedItem());
     }//GEN-LAST:event_jButton1ActionPerformed

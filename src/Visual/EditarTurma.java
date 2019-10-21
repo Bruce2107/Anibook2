@@ -7,7 +7,6 @@ import Banco.FuncoesDAO;
 import Classes.Funcoes;
 import Classes.TabelaEF;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 public class EditarTurma extends javax.swing.JInternalFrame {
@@ -77,16 +76,16 @@ public class EditarTurma extends javax.swing.JInternalFrame {
         ativo.setText("Ativo");
 
         salvar.setText("Salvar");
-        salvar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                salvarActionPerformed(evt);
+        salvar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                salvarMouseClicked(evt);
             }
         });
 
         jButton2.setText("Excluir Turma");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton2MouseClicked(evt);
             }
         });
 
@@ -109,9 +108,9 @@ public class EditarTurma extends javax.swing.JInternalFrame {
         jScrollPane2.setViewportView(Tabela);
 
         jButton1.setText("Compensar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
             }
         });
 
@@ -201,40 +200,6 @@ public class EditarTurma extends javax.swing.JInternalFrame {
             t.visualizar(Tabela,cpf+(String)Turmas.getSelectedItem());
     }//GEN-LAST:event_TurmasItemStateChanged
 
-    private void salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvarActionPerformed
-        int idt = Integer.parseInt(id.getText());
-        String nomet = nome.getText();
-        int faltast = Integer.parseInt(faltas.getText());
-        int compt = Integer.parseInt(compensadas.getText());
-        int sugt = Integer.parseInt(sug.getText());
-        boolean ativot = ativo.isSelected();
-        if(fdao.Salvar(idt, nomet, faltast,sugt, compt, ativot,cpf+Turmas.getSelectedItem())){
-            salvar.setEnabled(false);nome.setText("");id.setText("");faltas.setText("");compensadas.setText("");sug.setText("");ativo.setSelected(false);
-            nome.setEnabled(false);id.setEnabled(false);faltas.setEnabled(false);compensadas.setEnabled(false);ativo.setEnabled(false);sug.setEnabled(false);
-            t.visualizar(Tabela, cpf+Turmas.getSelectedItem());
-        }
-        else{
-            JOptionPane optionPane = new JOptionPane("Não foi possível salvar as alterações", JOptionPane.ERROR_MESSAGE);    
-            JDialog dialog = optionPane.createDialog("Erro");
-            dialog.setAlwaysOnTop(true);
-            dialog.setVisible(true);
-        }
-
-    }//GEN-LAST:event_salvarActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        int r = JOptionPane.showConfirmDialog(null, "Deseja excluir a turma?", "", JOptionPane.YES_NO_OPTION);
-        if(r == JOptionPane.YES_OPTION)
-            if(fdao.ApagarTurma(cpf+Turmas.getSelectedItem()))
-                JOptionPane.showMessageDialog(null,"Turma apagada com sucesso"); else{JOptionPane optionPane = new JOptionPane("Não foi possível excluir a turma", JOptionPane.ERROR_MESSAGE);    
-        JDialog dialog = optionPane.createDialog("Erro");
-        dialog.setAlwaysOnTop(true);
-        dialog.setVisible(true);}
-        f.AtualizaCombo(cpf, Turmas);
-        t.visualizar(Tabela, cpf+(String)Turmas.getSelectedItem());
-                
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void TabelaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TabelaMouseClicked
 
         rown = Tabela.rowAtPoint(evt.getPoint());
@@ -263,7 +228,7 @@ public class EditarTurma extends javax.swing.JInternalFrame {
                         compensadas.setText(""+compst);
                         ativo.setSelected(ativot);                       
                      }catch(Exception ex){
-                        System.out.println(ex.getMessage());
+                        f.gerarMessageBox("ERRO", ex.getMessage());
                      }
                     
                 }
@@ -271,17 +236,54 @@ public class EditarTurma extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_TabelaMouseClicked
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         if(fdao.Compensar(cpf+Turmas.getSelectedItem()))
-            JOptionPane.showMessageDialog(null, "Sucesso");
+            f.gerarMessageBox(null, "Sucesso");
         else{
-            JOptionPane optionPane = new JOptionPane("Não foi possível realizar a compensação", JOptionPane.ERROR_MESSAGE);    
-            JDialog dialog = optionPane.createDialog("Erro");
-            dialog.setAlwaysOnTop(true);
-            dialog.setVisible(true);
+            f.gerarMessageBox("ERRO","Não foi possível realizar a compensação");    
+
         }
         t.visualizar(Tabela, cpf+(String)Turmas.getSelectedItem());
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+        int r = JOptionPane.showConfirmDialog(null, "Deseja excluir a turma?", "", JOptionPane.YES_NO_OPTION);
+        if(r == JOptionPane.YES_OPTION)
+            if(fdao.ApagarTurma(cpf+Turmas.getSelectedItem()))
+                f.gerarMessageBox(null,"Turma apagada com sucesso"); else f.gerarMessageBox("ERRO","Não foi possível excluir a turma");    
+        f.AtualizaCombo(cpf, Turmas);
+        t.visualizar(Tabela, cpf+(String)Turmas.getSelectedItem());
+    }//GEN-LAST:event_jButton2MouseClicked
+
+    private void salvarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_salvarMouseClicked
+        int idt = Integer.parseInt(id.getText());
+        String nomet = null;
+        int faltast;
+        int compt;
+        int sugt = Integer.parseInt(sug.getText());
+        boolean ativot = ativo.isSelected();
+        int s = 0;
+        if(nome.getText() == null || "".equals(nome.getText()))
+            f.gerarMessageBox("ERRO", "O nome deve ser preenchido");
+        else{ nomet = nome.getText();s++;}
+        if(("".equals(faltas.getText())) || (faltas.getText() == null) || (Integer.parseInt(faltas.getText()) < 0)){
+            faltast = 0; s++;
+        }else{faltast = Integer.parseInt(faltas.getText());s++;}
+        if(("".equals(compensadas.getText())) || (compensadas.getText() == null) || (Integer.parseInt(compensadas.getText()) < 0)){
+            compt = 0; s++;
+        }else{compt = Integer.parseInt(compensadas.getText());s++;}
+        if(s == 3){
+            if(fdao.Salvar(idt, nomet, faltast,sugt, compt, ativot,cpf+Turmas.getSelectedItem())){
+                salvar.setEnabled(false);nome.setText("");id.setText("");faltas.setText("");compensadas.setText("");sug.setText("");ativo.setSelected(false);
+                nome.setEnabled(false);id.setEnabled(false);faltas.setEnabled(false);compensadas.setEnabled(false);ativo.setEnabled(false);sug.setEnabled(false);
+                t.visualizar(Tabela, cpf+Turmas.getSelectedItem());
+                f.gerarMessageBox("", "Alterações salvas");
+            }
+            else{
+                f.gerarMessageBox("ERRO", "Não foi possível salvar as alterações");
+            }
+        }
+    }//GEN-LAST:event_salvarMouseClicked
     public void atualiza() {
         if(Turmas.getSelectedItem() != null)
             t.visualizar(Tabela,cpf+(String)Turmas.getSelectedItem());

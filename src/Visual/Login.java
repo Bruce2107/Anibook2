@@ -11,8 +11,6 @@ import de.mkammerer.argon2.Argon2Factory;
 //import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 //import static java.util.Objects.hash;
 public class Login extends javax.swing.JFrame {
 
@@ -21,7 +19,6 @@ public class Login extends javax.swing.JFrame {
         this.setLocationRelativeTo( null );
         getRootPane().setDefaultButton(btnLogar);
         Usuario.requestFocus();
-        mensagem.setVisible(false);
     }
     Funcoes f = new Funcoes();
     @SuppressWarnings("unchecked")
@@ -32,7 +29,6 @@ public class Login extends javax.swing.JFrame {
         Senha = new javax.swing.JPasswordField();
         Usuario = new javax.swing.JTextField();
         btnLogar = new javax.swing.JButton();
-        mensagem = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -60,15 +56,6 @@ public class Login extends javax.swing.JFrame {
                 btnLogarMouseClicked(evt);
             }
         });
-        btnLogar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogarActionPerformed(evt);
-            }
-        });
-
-        mensagem.setFont(new java.awt.Font("Tahoma", 3, 11)); // NOI18N
-        mensagem.setForeground(new java.awt.Color(255, 0, 0));
-        mensagem.setText("Usuário ou senha incorretos");
 
         jLabel1.setForeground(new java.awt.Color(0, 0, 153));
         jLabel1.setText("Criar Conta!");
@@ -100,10 +87,6 @@ public class Login extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(100, 100, 100)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
-                        .addComponent(mensagem)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
@@ -137,9 +120,7 @@ public class Login extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mensagem, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -148,33 +129,36 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     private void logar(){
         FuncoesDAO fdao = new FuncoesDAO();
-        
-        Argon2 argon2 = Argon2Factory.create();
-        String user = Usuario.getText();
-        String senha = String.valueOf(Senha.getPassword());
-        ResultSet a = fdao.Consulta(user);
-        String hash = "";
-        try{
-            while(a.next()){
-                hash = a.getString("senha");
+        if(Usuario.getText() == null || "".equals(Usuario.getText().trim())){
+            f.gerarMessageBox("ERRO","Insira um usuário válido");
+        }else{
+            if("".equals(String.valueOf(Senha.getPassword()).trim()) || String.valueOf(Senha.getPassword()) == null)
+                f.gerarMessageBox("ERRO", "Insira uma senha válida");
+            else{
+                Argon2 argon2 = Argon2Factory.create();
+                String user = Usuario.getText();
+                String senha = String.valueOf(Senha.getPassword());
+                ResultSet a = fdao.Consulta(user);
+                String hash = "";
+                try{
+                    while(a.next()){
+                        hash = a.getString("senha");
+                    }
+                }catch(SQLException e){
+                    System.err.print(e.getMessage());
+                }
+
+                if (argon2.verify(hash, senha)) {
+                    Logado l = new Logado();
+                    l.getCPF(user);
+                    l.setVisible(true);
+                    dispose();
+                }
+                else{
+                    f.gerarMessageBox("ERRO", "Usuário ou senha incorreto");
+                }
             }
-        }catch(SQLException e){
-            System.err.print(e.getMessage());
         }
-        
-        if (argon2.verify(hash, senha)) {
-            Logado l = new Logado();
-            l.getCPF(user);
-            l.setVisible(true);
-            dispose();
-        }
-        else{
-            JOptionPane optionPane = new JOptionPane("Usuário ou senha incorreto", JOptionPane.ERROR_MESSAGE);    
-            JDialog dialog = optionPane.createDialog("Erro");
-            dialog.setAlwaysOnTop(true);
-            dialog.setVisible(true);
-            //mensagem.setVisible(true);
-        }      
     }
     private void btnLogarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLogarMouseClicked
         logar();
@@ -188,10 +172,6 @@ public class Login extends javax.swing.JFrame {
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
         f.AbrirNavegador("http://www.anibook.com.br/TCC/paginas/criarconta.php");
     }//GEN-LAST:event_jLabel1MouseClicked
-
-    private void btnLogarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogarActionPerformed
-        logar();
-    }//GEN-LAST:event_btnLogarActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> {
@@ -207,7 +187,6 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel mensagem;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }
